@@ -105,6 +105,10 @@ function saveBackgroundColor(url, color) {
 // user devices.
 document.addEventListener('DOMContentLoaded', () => {
 	getCurrentTabUrl((url) => {
-		document.getElementById('cul').innerText = url
+		$('#cul').text(url)
 	});
+	
+	$('#checkPage').click(function() {
+		console.log('pouet')
+	})
 });
