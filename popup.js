@@ -14,7 +14,7 @@ function getCurrentTabUrl(callback) {
 	var queryInfo = {
 		active: true,
 		currentWindow: true
-	};
+	}
 
 	chrome.tabs.query(queryInfo, (tabs) => {
 		// chrome.tabs.query invokes the callback with a list of tabs that match the
@@ -22,29 +22,29 @@ function getCurrentTabUrl(callback) {
 		// one tab, so we can safely assume that |tabs| is a non-empty array.
 		// A window can only have one active tab at a time, so the array consists of
 		// exactly one tab.
-		var tab = tabs[0];
+		var tab = tabs[0]
 
 		// A tab is a plain object that provides information about the tab.
 		// See https://developer.chrome.com/extensions/tabs#type-Tab
-		var url = tab.url;
+		var url = tab.url
 
 		// tab.url is only available if the "activeTab" permission is declared.
 		// If you want to see the URL of other tabs (e.g. after removing active:true
 		// from |queryInfo|), then the "tabs" permission is required to see their
 		// "url" properties.
-		console.assert(typeof url == 'string', 'tab.url should be a string');
+		console.assert(typeof url == 'string', 'tab.url should be a string')
 
-		callback(url);
-	});
+		callback(url)
+	})
 
 	// Most methods of the Chrome extension APIs are asynchronous. This means that
 	// you CANNOT do something like this:
 	//
-	// var url;
+	// var url
 	// chrome.tabs.query(queryInfo, (tabs) => {
-	//   url = tabs[0].url;
-	// });
-	// alert(url); // Shows "undefined", because chrome.tabs.query is async.
+	//   url = tabs[0].url
+	// })
+	// alert(url) // Shows "undefined", because chrome.tabs.query is async.
 }
 
 /**
@@ -53,7 +53,7 @@ function getCurrentTabUrl(callback) {
  * @param {string} color The new background color.
  */
 function changeBackgroundColor(color) {
-	var script = 'document.body.style.backgroundColor="' + color + '";';
+	var script = 'document.body.style.backgroundColor="' + color + '";'
 	// See https://developer.chrome.com/extensions/tabs#method-executeScript.
 	// chrome.tabs.executeScript allows us to programmatically inject JavaScript
 	// into a page. Since we omit the optional first argument "tabId", the script
@@ -61,7 +61,7 @@ function changeBackgroundColor(color) {
 	// default.
 	chrome.tabs.executeScript({
 		code: script
-	});
+	})
 }
 
 /**
@@ -76,8 +76,8 @@ function getSavedBackgroundColor(url, callback) {
 	// for chrome.runtime.lastError to ensure correctness even when the API call
 	// fails.
 	chrome.storage.sync.get(url, (items) => {
-		callback(chrome.runtime.lastError ? null : items[url]);
-	});
+		callback(chrome.runtime.lastError ? null : items[url])
+	})
 }
 
 /**
@@ -87,12 +87,12 @@ function getSavedBackgroundColor(url, callback) {
  * @param {string} color The background color to be saved.
  */
 function saveBackgroundColor(url, color) {
-	var items = {};
-	items[url] = color;
+	var items = {}
+	items[url] = color
 	// See https://developer.chrome.com/apps/storage#type-StorageArea. We omit the
 	// optional callback since we don't need to perform any action once the
 	// background color is saved.
-	chrome.storage.sync.set(items);
+	chrome.storage.sync.set(items)
 }
 
 // This extension loads the saved background color for the current tab if one
@@ -103,12 +103,29 @@ function saveBackgroundColor(url, color) {
 // to a document's origin. Also, using chrome.storage.sync instead of
 // chrome.storage.local allows the extension data to be synced across multiple
 // user devices.
+var testUrl = ''
+
 document.addEventListener('DOMContentLoaded', () => {
-	getCurrentTabUrl((url) => {
-		$('#cul').text(url)
-	});
+	chrome.storage.sync.get({
+		tpl: 'test/test.html'
+	}, function (items) {
+		testUrl = items.tpl
+	})
 	
 	$('#checkPage').click(function() {
-		console.log('pouet')
+		chrome.tabs.executeScript(null, { file: "lib/jquery-3.2.1.min.js" }, function() {
+			chrome.tabs.executeScript(null, { file: "content.js" });
+		})
 	})
-});
+	$('#testbn').click(function() {
+		chrome.tabs.query({active: true}, function (tab) {
+			chrome.tabs.update(tab.id, {url: testUrl})
+		})
+	})
+})
+
+chrome.tabs.onUpdated.addListener(function() {
+	getCurrentTabUrl((url) => {
+		$('#cul').text(url)
+	})
+})
