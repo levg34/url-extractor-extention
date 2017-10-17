@@ -106,6 +106,10 @@ function saveBackgroundColor(url, color) {
 var testUrl = ''
 
 document.addEventListener('DOMContentLoaded', () => {
+	chrome.tabs.executeScript(null, { file: "lib/jquery-3.2.1.min.js" }, function() {
+		chrome.tabs.executeScript(null, { file: "content.js" });
+	})
+	
 	chrome.storage.sync.get({
 		tpl: 'test/test.html'
 	}, function (items) {
