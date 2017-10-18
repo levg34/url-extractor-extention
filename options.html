@@ -2,12 +2,24 @@
 <html>
 <head><title>URL Extractor Plugin Options</title></head>
 <body>
+<h3>Options:</h3>
+<label>
+  <input type="checkbox" id="simple">
+  Mode simple.
+</label>
 
+<h3>Advanced options:</h3>
+<label>
+  <input type="checkbox" id="devmode">
+  Development mode.
+</label>
+<div id="tp" hidden>
 Test page:
 <input type="text" id="tpl">
+</div>
 
 <div id="status"></div>
-<button id="save">Save</button>
+<p><button id="save">Save</button></p>
 
 <script src="lib/jquery-3.2.1.min.js"></script>
 <script src="options.js"></script>
